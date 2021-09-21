@@ -156,7 +156,7 @@ resource "aws_network_interface" "Daniel_Network_Interface_tf" {
   security_groups = [aws_security_group.Daniel_Security_Group_tf.id]
 
   tags = {
-    "key" = "Daniel_Subnet"
+    Name = "Daniel_Subnet"
     costcenter = "Daniel"
     managed_by = "terraform"
   }
