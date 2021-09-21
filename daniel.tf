@@ -124,6 +124,13 @@ resource "aws_security_group" "Daniel_Security_Group_tf" {
     } 
   egress {
       cidr_blocks = [ "0.0.0.0/0" ]
+      description = "Allow wget Traffic"
+      from_port = 443
+      protocol = "tcp"
+      to_port = 443
+    } 
+  egress {
+      cidr_blocks = [ "0.0.0.0/0" ]
       description = "Allow DNS Traffic"
       from_port = 53
       protocol = "udp"
@@ -192,15 +199,17 @@ resource "aws_instance" "Daniel_Server_tf" {
               #!/bin/bash
               # update system and install git
               sudo apt update -y
-              sudo apt-get install git
               # add user mc, with permissions in /minecraft
               sudo useradd --no-create-home mc
               sudo mkdir /minecraft
               sudo chown mc /minecraft
               # download & install openjdk16
-              sudo dpkg -i jdk-16.0.2_linux-x64_bin.deb
+              sudo add-apt-repository ppa:linuxuprising/java
+              sudo apt update -y
+              sudo apt install oracle-java16-installer -y
+              sudo apt-get install git -y
               # clone vanilla base git repo
-              git clone https://github.com/jhculb/Vanilla-MC-Server-Base.git
+              git clone https://github.com/jhculb/Vanilla-MC-Server-Base.git /minecraft
               # move minecraft.service
               sudo mv /minecraft/minecraft.service /etc/systemd/system/
               sudo chmod 644 /etc/systemd/system/minecraft.service
