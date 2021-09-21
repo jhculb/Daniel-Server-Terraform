@@ -199,26 +199,54 @@ resource "aws_instance" "Daniel_Server_tf" {
               #!/bin/bash
               # update system and install git
               sudo apt update -y
+              sudo echo "1" > /progress
+
               # add user mc, with permissions in /minecraft
               sudo useradd --no-create-home mc
               sudo mkdir /minecraft
               sudo chown mc /minecraft
+              sudo echo "2" > /progress
+
               # download & install openjdk16
-              sudo add-apt-repository ppa:linuxuprising/java
-              sudo apt update -y
-              sudo apt install oracle-java16-installer -y
+              sudo add-apt-repository ppa:linuxuprising/java -y
+              sudo echo "3" > /progress
+
+              sudo apt update
+              sudo echo "4" > /progress
+
+              wget --no-check-certificate -c --header "Cookie: oraclelicense=accept-securebackup-cookie" https://download.oracle.com/otn-pub/java/jdk/16.0.2+7/d4a915d82b4c4fbb9bde534da945d746/jdk-16.0.2_linux-x64_bin.tar.gz -P /home/ubuntu/
+              sudo mkdir /usr/lib/jvm
+              cd /usr/lib/jvm
+              sudo tar -xvzf /home/ubuntu/jdk-16.0.2_linux-x64_bin.tar.gz
+              sudo sed -e 's|PATH="\(.*\)"|PATH="/opt/jdk1.6.0_45/bin:\1"\nJAVA_HOME="/usr/lib/jvm/jdk-16.0.2"|g' -i /etc/environment
+              sudo update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/jdk-16.0.2/bin/java" 0
+              sudo update-alternatives --install "/usr/bin/javac" "javac" "/usr/lib/jvm/jdk-16.0.2/bin/javac" 0
+              sudo update-alternatives --set java /usr/lib/jvm/jdk-16.0.2/bin/java
+              sudo update-alternatives --set javac /usr/lib/jvm/jdk-16.0.2/bin/javac
+              sudo echo "5" > /progress
+
               sudo apt-get install git -y
+              sudo echo "6" > /progress
+
               # clone vanilla base git repo
               git clone https://github.com/jhculb/Vanilla-MC-Server-Base.git /minecraft
+              sudo echo "7" > /progress
+
               # move minecraft.service
               sudo mv /minecraft/minecraft.service /etc/systemd/system/
               sudo chmod 644 /etc/systemd/system/minecraft.service
+              sudo echo "8" > /progress
+
               # copy minecraft service conf.d
               sudo mkdir /etc/conf.d
               sudo mv /minecraft/minecraft /etc/conf.d/
+              sudo echo "9" > /progress
+
               # start service
               sudo systemctl start minecraft
+
               # enable service
               sudo systemctl enable minecraft
+              sudo echo "0" > /progress
               EOF
 }
