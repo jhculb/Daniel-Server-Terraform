@@ -53,7 +53,7 @@ resource "aws_subnet" "Daniel_Subnet_tf" {
     costcenter = "Daniel"
     managed_by = "terraform"
   }
-  availability_zone = "eu-west-1a"
+  availability_zone = "eu-west-2a"
   # This is to prevent errors where the availability zone is different throughout deployment
   # I assume but don't know whether this can be set dynamically with 'depends on' and attributes
 }
@@ -77,29 +77,43 @@ resource "aws_security_group" "Daniel_Security_Group_tf" {
       cidr_blocks = [ var.my_ip ]
       description = "Allow SSH Traffic"
       from_port = 22
-      protocol = "ssh"
+      protocol = "tcp"
       to_port = 22
     }
     ingress {
       cidr_blocks = [ "0.0.0.0/0" ]
       description = "Allow Minecraft Traffic"
       from_port = 25565
-      protocol = "ssh"
+      protocol = "tcp"
       to_port = 25565
     }
-  egress {
-      cidr_blocks = [ var.my_ip ]
-      description = "Allow SSH Traffic"
-      from_port = 22
-      protocol = "ssh"
-      to_port = 22
+    ingress {
+      cidr_blocks = [ "0.0.0.0/0" ]
+      description = "Allow Minecraft UDP Traffic"
+      from_port = 19132
+      protocol = "udp"
+      to_port = 19132
     }
+  # egress {
+  #     cidr_blocks = [ var.my_ip ]
+  #     description = "Allow SSH Traffic"
+  #     from_port = 22
+  #     protocol = "tcp"
+  #     to_port = 22
+  #   }
   egress {
       cidr_blocks = [ "0.0.0.0/0" ]
       description = "Allow Minecraft Traffic"
       from_port = 25565
-      protocol = "ssh"
+      protocol = "tcp"
       to_port = 25565
+    } 
+  egress {
+      cidr_blocks = [ "0.0.0.0/0" ]
+      description = "Allow Minecraft UDP Traffic"
+      from_port = 19132
+      protocol = "udp"
+      to_port = 19132
     } 
   egress {
       cidr_blocks = [ "0.0.0.0/0" ]
@@ -166,7 +180,7 @@ resource "aws_instance" "Daniel_Server_tf" {
       costcenter = "Daniel"
       managed_by = "terraform"
   }
-  availability_zone = "eu-west-1a"
+  availability_zone = "eu-west-2a"
   key_name = "Daniel_Minecraft"
 
   network_interface {
@@ -188,11 +202,11 @@ resource "aws_instance" "Daniel_Server_tf" {
               # clone vanilla base git repo
               git clone https://github.com/jhculb/Vanilla-MC-Server-Base.git
               # move minecraft.service
-              sudo mv /minecraft/minecraft.service /etc/systemd/system/minecraft.service
+              sudo mv /minecraft/minecraft.service /etc/systemd/system/
               sudo chmod 644 /etc/systemd/system/minecraft.service
               # copy minecraft service conf.d
               sudo mkdir /etc/conf.d
-              sudo mv /minecraft/minecraft /etc/conf.d/minecraft
+              sudo mv /minecraft/minecraft /etc/conf.d/
               # start service
               sudo systemctl start minecraft
               # enable service
